@@ -33,6 +33,7 @@ const handleValidationError = (err) => {
 
 const errorMiddleware=(err,req,res,next)=>{
     err.statusCode = err.statusCode || 400;
+    console.log(err);
     if(process.env.NODE_ENV == 'development'){
         sendErrorDev(err, res);
     }else if(process.env.NODE_ENV == 'production'){

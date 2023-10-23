@@ -1,5 +1,5 @@
 const express=require('express');
-
+const socket=require('./socket');
 const dotenv=require('dotenv');
 const dbConnect=require('./config/db');
 
@@ -16,9 +16,13 @@ const server=app.listen(port,()=>{
     console.log('server listening on port ')
 });
 
+const io=require('socket.io')(server);
+socket(io);
+
+
 process.on('unhandledRejection',(err)=>{
     console.log(err);
-    server.close(()=>{
+    server.close( () => {
         process.exit(1);
-    })
+    } );
 });
