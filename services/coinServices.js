@@ -32,4 +32,8 @@ const coinWebhook= expressHandler ( async (req,res,next) => {
     };
 } );
 
-module.exports={buyCoin};
+const successPage=expressHandler(async(req,res,next)=>{
+    res.render('success');
+});
+
+module.exports={buyCoin,coinWebhook,successPage};
