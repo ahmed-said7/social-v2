@@ -16,7 +16,7 @@ const buyCoin= expressHandler ( async(req,res,next) => {
 
 const coinWebhook= expressHandler ( async (req,res,next) => {
     const result=createHash(req);
-    if ( result.hashed == req.query){
+    if ( result.hashed == req.query.hmac){
         const id= result.order_id;
         const data=req.body.obj.payment_key_claims.billing_data;
         const email=data.email;
@@ -30,10 +30,10 @@ const coinWebhook= expressHandler ( async (req,res,next) => {
     } else {
         return next(new apiError('payment failed'),400);
     };
-} );
+});
 
 const successPage=expressHandler(async(req,res,next)=>{
     res.render('success');
 });
 
-module.exports={buyCoin,coinWebhook,successPage};
+module.exports={ buyCoin , coinWebhook , successPage };
