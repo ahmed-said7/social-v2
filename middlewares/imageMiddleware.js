@@ -4,7 +4,7 @@ const uuid=require('uuid');
 const sharp=require('sharp');
 const expressAsyncHandler = require('express-async-handler');
 
-const uploadVideo=(folder,bodyName)=>{
+const uploadVideo=()=>{
 
     const storage=multer.diskStorage(
         {
@@ -88,6 +88,5 @@ const resizeMultipleFiles= (folderName,multiField,singleField) => expressAsyncHa
     return next();
 });
 
-module.exports=
-{uploadSingleImage,uploadMultipleImage,uploadSingleVideo
-    ,resizeSingleFile,resizeMultipleFiles}
+module.exports={uploadSingleImage,uploadMultipleImage,uploadSingleVideo
+    ,resizeSingleFile,resizeMultipleFiles};

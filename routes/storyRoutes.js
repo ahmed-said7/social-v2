@@ -3,7 +3,7 @@ const router =express.Router();
 const {protected,allowedTo}=require('../services/authServices');
 const {uploadSingleVideo,uploadSingleImage,resizeSingleFile} =require("../middlewares/imageMiddleware");
 const { accessStory,createStory,
-    getFollowingStories,getUserStories,
+    getFollowingStories,getUserStories,voteStory,unvoteStory,
     getAllStories,getStory,updateStory,deleteStory }=require('../services/storyServices');
 
 router.use(protected);
@@ -18,7 +18,9 @@ router.route('/:id').get(getStory)
     uploadSingleImage('image'),resizeSingleFile('story',"image"),updateStory)
     .delete(accessStory,deleteStory);
 
-router.route('/stories/:id').post(getUserStories);
-router.route('/following-stories').post(getFollowingStories);
+router.route('/stories/:id').get(getUserStories);
+router.route('/following-stories').get(getFollowingStories);
+router.route('/vote/:id').get(voteStory);
+router.route('/unvote/:id').get(unvoteStory);
 
 module.exports = router;

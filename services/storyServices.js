@@ -39,6 +39,40 @@ const createStory=expressHandler(async(req,res,next)=>{
     res.status(200).json({story});
 });
 
+const voteStory=expressHandler(async(req,res,next)=>{
+    const id=req.user._id.toString();
+    const story =await storyModel.findOne(req.params.id);
+    if(! story ){
+        return next(new apiError(' Could not find story ',400));
+    };
+    const index=story.votes.findIndex((ele)=>{ ele.user.toString() ==id });
+    if(index > -1){
+        story.votes[index].type=req.body.type;
+    }else {
+        story.votes.push({user:id,type:req.body.type})
+    }
+    await story.save();
+    await story.populate({path:"votes.user",select:"name profile"});
+    res.status(200).json({votes:story.votes});
+});
+
+const unvoteStory=expressHandler(async(req,res,next)=>{
+    const id = req.user._id.toString();
+    const story =await storyModel.findOne(req.params.id);
+    if(! story ){
+        return next(new apiError(' Could not find story ',400));
+    };
+    const index=story.votes.findIndex((ele)=>{ ele.user.toString() ==id });
+    if(index > -1){
+        story.votes.splice(index,1);
+    };
+    await story.save();
+    await story.populate({path:"votes.user",select:"name profile"});
+    res.status(200).json({votes:story.votes});
+});
+
+
+
 const accessStory=expressHandler(async(req,res,next)=>{
     const story=await storyModel.findById(req.params.id);
     if( story.user.toString() != req.user._id.toString() ){
@@ -48,4 +82,4 @@ const accessStory=expressHandler(async(req,res,next)=>{
 });
 
 module.exports = { accessStory,createStory,getFollowingStories,getUserStories,
-    getAllStories,getStory,updateStory,deleteStory };
+    getAllStories,getStory,updateStory,deleteStory,voteStory,unvoteStory };
