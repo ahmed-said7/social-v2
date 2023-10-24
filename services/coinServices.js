@@ -8,7 +8,7 @@ const buyCoin= expressHandler ( async(req,res,next) => {
     const user=req.user;
     const {coin,price}=req.body;
     const result=await firstStep(user , coin*price*100);
-    user.transaction.push({amount:coin,paid:false,orderId:result.id});
+    user.transaction.push({amount:coin,paid:false,orderId:result.id,time:Date.now()});
     await user.save();
     res.status(200).json({user,result});
 });
@@ -24,6 +24,7 @@ const coinWebhook= expressHandler ( async (req,res,next) => {
         const index=user.transaction.findIndex((ele)=> ele.orderId == id);
         if(index > -1){
             user.transaction[index].paid=true;
+            user.transaction[index].time=Date.now();
             user.coins += user.transaction[index].amount;
         };
         await user.save();

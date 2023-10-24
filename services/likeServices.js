@@ -39,6 +39,7 @@ const likeComment=expressHandler(async (req,res,next)=>{
             return next(new apiError('you liked comment before',400));
         };
         comment.likes[index].type = req.body.type;
+        
     }else {
         comment.likes.push({type: req.body.type, user: req.user._id})
     };
