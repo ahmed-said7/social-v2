@@ -4,9 +4,38 @@ const uuid=require('uuid');
 const sharp=require('sharp');
 const expressAsyncHandler = require('express-async-handler');
 
+const uploadVideo=(folder,bodyName)=>{
+
+    const storage=multer.diskStorage(
+        {
+        destination:function(req,file,cb){
+            cb(null,`uploads/story`)
+        },
+        filename:function(req,file,cb){
+            const ext=file.mimetype.split('/')[1];
+            let filename=`story-${uuid.v4()}-${Date.now()}.${ext}`;
+            req.body.video=filename;
+            cb(null,filename);
+        }
+        });
+    const filter=function(req,file,cb){
+        if(file.mimetype.startsWith('video')){
+            return cb( null , true );
+        }else{
+            return cb( new apiError('Invalid file',400) , false );
+        };
+    };
+    return multer({ storage:storage , fileFilter:filter });
+};
+
+const uploadSingleVideo=function(field){
+    return uploadVideo().single(field);
+};
+
 const uploadImage=()=>{
     const storage=multer.memoryStorage();
     const filter=function(req,file,cb){
+        console.log(file);
         if(file.mimetype.startsWith('image')){
             return cb( null , true );
         }else{
@@ -23,6 +52,8 @@ const uploadSingleImage=function(field){
 const uploadMultipleImage=function(field){
     return uploadImage().fields(field);
 };
+
+
 
 const resizeSingleFile=(folderName,bodyName)=> expressAsyncHandler(async (req,res,next)=>{
     if(req.file){
@@ -58,4 +89,5 @@ const resizeMultipleFiles= (folderName,multiField,singleField) => expressAsyncHa
 });
 
 module.exports=
-{uploadSingleImage,uploadMultipleImage,resizeSingleFile,resizeMultipleFiles}
+{uploadSingleImage,uploadMultipleImage,uploadSingleVideo
+    ,resizeSingleFile,resizeMultipleFiles}

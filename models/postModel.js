@@ -4,8 +4,10 @@ const commentModel=require('../models/commentModel');
 
 const postSchema=new mongoose.Schema({
     user:{type:mongoose.Types.ObjectId,ref:"User"},
+    group:{type:mongoose.Types.ObjectId,ref:"Group"},
     text:String,
-    images:[String]
+    userPost: { type:Boolean , default:true }
+    ,images:[String]
     ,likes:[{
         type:{type:String,enum:["like", "love","haha", "sad", "angry", "wow"]
         ,required:true},

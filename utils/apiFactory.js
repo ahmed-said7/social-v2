@@ -2,9 +2,13 @@ const asyncHandler=require('express-async-handler');
 const apiFeatures=require('../utils/apiFeatures');
 const apiError = require('../utils/apiError');
 const userModel = require('../models/userModel');
-const getOne=(model)=> asyncHandler ( async(req,res,next)=>{
+const getOne=(model,population='')=> asyncHandler ( async(req,res,next)=>{
     const id=req.params.id;
-    const document=await model.findById(id);
+    const query=model.findById(id);
+    if(population){
+        query.populate(population);
+    };
+    const document=await query;
     if(!document){
         return next(new apiError(`Couldn't find ${model} for ${id}`,400));
     };

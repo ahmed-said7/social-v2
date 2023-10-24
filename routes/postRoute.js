@@ -13,7 +13,8 @@ const {uploadMultipleImage,resizeMultipleFiles} =require('../middlewares/imageMi
 router.use(protected);
 router.route('/').post(
     uploadMultipleImage([{name:"images",maxCount:10}])
-        ,resizeMultipleFiles('post',"images",undefined),setUserId,createPost).get(getPosts);
+        ,resizeMultipleFiles('post',"images",undefined),setUserId,createPost)
+        .get(getPosts);
 router.route('/:id').
     get(getPost).
     patch(accessPost,

@@ -200,7 +200,7 @@ const getProfile=expressHandler( async (req,res, next) => {
         {path:"followers",select:"name profile"},
         {path:"friends",select:"name profile"}
     ]);
-    const posts=await postModel.find({user:user._id}).
+    const posts=await postModel.find({user:user._id,userPost:true}).
     populate([
         {
             path:"user",select:"name profile",Model:"User"
@@ -236,7 +236,8 @@ const savePost=expressHandler(async (req,res,next)=>{
     await user.populate([
         { 
             path:"savedPosts.post" , 
-            populate :{path:"user",select:"name profile"}
+            populate :{path:"user",select:"name profile",Model:"User"},
+            populate :{path:"likes.user",select:"name profile",Model:"User"}
         }
     ]);
     res.status(201).json({savedPosts:user.savedPosts});
@@ -251,7 +252,8 @@ const unsavePost=expressHandler(async (req,res,next)=>{
     await user.populate([
         { 
             path:"savedPosts.post" , 
-            populate :{path:"user",select:"name profile"}
+            populate :{path:"user",select:"name profile",Model:"User"},
+            populate :{path:"likes.user",select:"name profile",Model:"User"}
         }
     ]);
     res.status(201).json({savedPosts:user.savedPosts});

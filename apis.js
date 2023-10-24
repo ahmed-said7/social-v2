@@ -6,6 +6,8 @@ const commentRouter=require('./routes/commentRoute');
 const chatRouter=require('./routes/chatRoute');
 const messageRouter=require('./routes/messageRoute');
 const likeRouter=require('./routes/likeRoute');
+const groupRouter=require('./routes/groupRoutes');
+const storyRouter=require('./routes/storyRoutes');
 const { successPage,coinWebhook  } =require('./services/coinServices');
 const errorMiddleware = require('./middlewares/errorMiddleware');
 const express=require('express');
@@ -24,7 +26,7 @@ const api=(app)=>{
     };
 
     app.use(express.static( 'uploads' ));
-    app.use(express.static( 'puplic' ));
+    app.use(express.static( 'public' ));
     app.set( 'view engine' , 'ejs');
     app.post( '/webhook' , coinWebhook );
     app.get( '/success' , successPage );
@@ -36,6 +38,8 @@ const api=(app)=>{
     app.use('/chat',chatRouter);
     app.use('/message',messageRouter);
     app.use('/coin',coinRouter);
+    app.use('/group',groupRouter);
+    app.use('/story',storyRouter);
     app.all( '*' , (req,res,next) => next ( new apiError('can not find route',400) ));
     app.use(errorMiddleware);
 

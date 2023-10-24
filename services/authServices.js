@@ -1,4 +1,5 @@
 const userModel=require("../models/userModel");
+
 const postModel=require("../models/postModel");
 const crypto=require('crypto');
 const jwt=require('jsonwebtoken');
@@ -7,6 +8,8 @@ const bcryptjs=require('bcryptjs');
 const apiError = require("../utils/apiError");
 const dotenv=require('dotenv');
 const sendMail = require("../utils/sendMail");
+const util=require('util');
+const _scrypt=util.promisify(crypto.scrypt);
 dotenv.config();
 
 const login=expressHandler(async (req, res, next) => {
@@ -90,7 +93,7 @@ const deleteLoggedUser=expressHandler(async(req,res,next)=>{
 
 const updateLoggedUserPassword=expressHandler(async(req,res,next)=>{
     let user=req.user;
-    user=req.body.password;
+    user.password=req.body.password;
     user.passwordChangedAt=Date.now();
     await user.save();
     res.status(200).json({status:"deleted"});
@@ -104,13 +107,14 @@ const forgetPassword=expressHandler(async(req,res,next)=>{
     const mailSender=new sendMail(user);
     const resetCode=mailSender.createRandomCode();
     const randomCode=crypto.randomBytes(8).toString('hex');
-    const hashCode=(await crypto.scrypt(resetCode,randomCode,32)).toString('hex');
+    const hashCode=(await _scrypt(resetCode,randomCode,32)).toString('hex');
     user.passwordResetCode=hashCode+"&"+randomCode;
     user.passwordExpiredAt=Date.now()+ 20*60*1000;
     user.resetCodeVertified=false;
     try{
         await mailSender.sendCode(resetCode);
-    }catch(e){
+    }catch(err){
+        console.log(err);
         user.passwordResetCode=undefined;
         user.passwordExpiredAt=undefined;
         user.resetCodeVertified=undefined;
@@ -127,13 +131,13 @@ const resetCodeVertify=expressHandler( async (req, res ,next) => {
     const resetCode=req.body.resetCode;
     const storedHash=user.passwordResetCode;
     const salt=storedHash.split('&')[1];
-    const resultHash=(await crypto.scrypt(resetCode,salt,32)).toString('hex');
+    const resultHash=(await _scrypt(resetCode,salt,32)).toString('hex');
     if(resultHash != storedHash.split('&')[0]){
         return next(new apiError('resetCode mismatch',400));
     };
     if(user.passwordExpiredAt < Date.now()){
         return next(new apiError('password reset code has been expired',400));
-    }
+    };
     user.passwordResetCode=undefined;
     user.passwordExpiredAt=undefined;
     user.resetCodeVertified=true;

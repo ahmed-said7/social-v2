@@ -1,11 +1,12 @@
 const {uploadMultipleImage,resizeMultipleFiles} =require('../middlewares/imageMiddleware');
+const groupRouter=require('../routes/groupRoutes')
 const express= require('express');
 const router =express.Router();
 const {protected,allowedTo} = require('../services/authServices');
 const {
     addFriend,getProfile,cancelRequest,
     deleteRequest,addToSearch,removeFromSearch,removeFollwer,
-    followBack,unfollow,follow,acceptRequest,unFriend
+    followBack,unfollow,follow,acceptRequest,unFriend,savePost,unsavePost
     ,getUsers,createUser,updateUser,deleteUser,updateUserPassword
 } = require('../services/userServices');
 
@@ -22,13 +23,21 @@ router.route('/unfollow/:id').patch(unfollow);
 router.route('/accept-request/:id').patch(acceptRequest);
 router.route('/get-profile/:id').patch(getProfile);
 router.route('/unfriend/:id').patch(unFriend);
+router.route('/save-post/:id').patch(savePost);
+router.route('/unsave-post/:id').patch(unsavePost);
+router.use('/groups',groupRouter);
+
 router.route('/').get(getUsers).
     post(uploadMultipleImage([{name:"cover",maxCount:4},{name:"profile",maxCount:1}])
     ,resizeMultipleFiles('message',"cover","profile"),createUser);
+
 router.route('/:id')
     .patch(uploadMultipleImage([{name:"cover",maxCount:4},{name:"profile",maxCount:1}])
     ,resizeMultipleFiles('user',"cover","profile"),updateUser)
     .delete(deleteUser);
-router.route('/update-pass/:id').patch(updateUserPassword);
+
+
+router.route('/update-pass/:id')
+    .patch(updateUserPassword);
 
 module.exports = router;
