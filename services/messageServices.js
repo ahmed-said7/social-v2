@@ -12,7 +12,7 @@ const setFilterObject=expressHandler(async (req,res,next) => {
     req.filterObj={};
     if(req.params.chatId){
         const chat=await chatModel.findOne({_id:req.params.chatId,
-            "members":req.user._id});
+            "members":req.user._id  });
         if(!chat ){
             return next(new apiError('no messages found',400));
         };
@@ -20,7 +20,8 @@ const setFilterObject=expressHandler(async (req,res,next) => {
         if( req.user._id.toString() == chat.admin.toString() ){
             await messageModel.updateMany(
                 {chat:req.params.chatId,seenByAdmin:false},{seenByAdmin:true});
-            chat.latestMessage=(await messageModel.find().sort("-createdAt"))[0]._id;
+            chat.latestMessage=
+                (await messageModel.find().sort("-createdAt"))[0]._id;
             await chat.save();
         } else {
             req.filterObj.seenByAdmin=true;
@@ -36,7 +37,7 @@ const getMessageRecipient=expressHandler(async(req,res,next)=>{
         message.seenByAdmin=true;
         await message.save();
     }else if(! message.seenByAdmin ){
-        res.status(200).json({status:"can not find message"});
+        return res.status(200).json({status:"can not find message"});
     };
     await message.populate([ {path:"sender",select:"name profile"}
         ,{path:"recipient",select:"name profile"} ]);
@@ -60,14 +61,16 @@ const createMessage=expressHandler(async (req,res,next)=>{
     if(!chat){
         return next(new apiError('chat Not Found',400));
     };
-    const recipient=chat.members.filter( (ele) => ele.toString() != sender._id.toString());
-    req.body.recipient=recipient;
-    req.body.sender=sender._id;
+    const recipient=chat.members.filter( 
+        (ele) => ele.toString() != sender._id.toString());
+    req.body.recipient = recipient;
+    req.body.sender = sender._id;
     const message=await messageModel.create(req.body);
     if(!message){
         return next(new apiError('Could not create message',400));
     };
-    if(sender.role=='admin') chat.latestMessage=message._id;
+    if( sender._id.toString() == chat.admin.toString() ) { 
+        chat.latestMessage=message._id; };
     await chat.save();
     res.status(200).json({message});
 });

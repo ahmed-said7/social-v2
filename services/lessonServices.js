@@ -64,7 +64,7 @@ const getLesson=expressHandler(async(req,res,next)=>{
     const {code}=req.body;
     if(!code) return next(new apiError('code not specified',400));
     const lesson=await lessonModel.findById(req.params.id);
-    if(!lesson || ! lesson.isPublished){
+    if( !lesson || !lesson.isPublished ){
         return next(new apiError('can not get a new lesson',400));
     };
     const accessCode=await codeModel.findOne({code,lesson:req.params.id});
@@ -106,7 +106,8 @@ const attendLesson=expressHandler(async(req,res,next)=>{
     };
     accessCode.consumed=true;
     await accessCode.save();
-    const index=user.attendedLessons.findIndex(({lesson}) => lesson.toString() == req.params.id.toString() );
+    const index=user.attendedLessons.findIndex(
+        ({lesson}) => lesson.toString() == req.params.id.toString() );
     if(index > -1){
         res.status(200).json({message:"You have attended lessons before"});
     }else {

@@ -2,6 +2,7 @@ const expressHandler=require('express-async-handler');
 const apiError = require('../utils/apiError');
 const{updateOne,deleteOne,getAll,getOne}=require('../utils/apiFactory');
 const storyModel = require('../models/storyModel');
+
 const updateStory=updateOne(storyModel);
 const deleteStory=deleteOne(storyModel);
 const getStory=getOne(storyModel,{path:"user",select:"name profile"});
@@ -86,7 +87,7 @@ const unvoteStory=expressHandler(async(req,res,next)=>{
     const id = req.user._id.toString();
     const story =await storyModel.findById(req.params.id);
     if(! story ){
-        return next(new apiError(' Could not find story ',400));
+        return next( new apiError(' Could not find story ',400));
     };
     const index=story.votes.findIndex(({user})=>{ user.toString() ==id });
     if(index > -1){

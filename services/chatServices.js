@@ -90,7 +90,7 @@ const leaveChat=expressHandler(async(req,res,next)=>{
         return next(new apiError('can Not Found',404));
     };
     if( user.toString() == chat.admin.toString() ){
-        res.status(200).json({status:"first select group admin"});
+        return res.status(200).json({status:"first select group admin"});
     };
     await chat.updateOne({$pull:{members:user}});
     await chat.save();

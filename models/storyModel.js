@@ -28,7 +28,8 @@ storySchema.pre('save', function(next){
 });
 
 storySchema.pre( /^find/ ,async function(next){
-    await storyModel.updateMany({ reel:false , duration :{ $lt : Date.now() }},{active:false});
+    await storyModel.updateMany(
+        { reel:false , duration :{ $lt : Date.now() }},{active:false});
     // await storyModel.deleteMany({active:false});
     this.find({active:true});
     return next();

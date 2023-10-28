@@ -1,6 +1,7 @@
 const mongoose= require('mongoose');
 require('dotenv').config();
-const messageModel = require('./messageModel');
+
+
 const chatSchema=new mongoose.Schema({
     image:String,isGroup:{default:false,type:Boolean},name:String,
     admin:{type:mongoose.Types.ObjectId,ref:"User"},
@@ -34,6 +35,6 @@ chatSchema.virtual('messages',{
     foreignField:"chat"
 });
 
-
 const chatModel=mongoose.model('Chat',chatSchema);
+
 module.exports=chatModel;

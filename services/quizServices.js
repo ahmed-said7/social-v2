@@ -32,12 +32,11 @@ const createQuiz=expressHandler(async(req,res,next)=>{
 
 const deleteQuiz=deleteOne(quizModel);
 const updateQuiz=updateOne(quizModel);
-const getAllQuizzes=getAll(quizModel,'quiz',[{path:"admin",select:"name profile"}
-    ,{path:"questions"}]);
+const getAllQuizzes=getAll(quizModel,'quiz',{path:"admin",select:"name profile"});
 
 const accessQuiz=expressHandler(async(req,res,next)=>{
     const quiz=await quizModel.findById(req.params.id);
-    if( quiz.admin.toString() != req.user._id.toString() ){
+    if( quiz?.admin.toString() != req.user._id.toString() ){
         return next(new apiError('you are not quiz owner',400));
     };
     return next();
@@ -117,12 +116,13 @@ const matchAnswers=expressHandler(async(req,res,next)=>{
 const takeQuiz=expressHandler(async(req,res,next)=>{
     let user=req.user;
     const {code}=req.body;
+    if(! code) return next(new apiError('Invalid code',400));
     const quiz=await quizModel.findById(req.params.id);
     if(!quiz || ! quiz.isPublished){
         return next(new apiError('can not get a new lesson',400));
     };
     await quiz.populate([{path:"admin",select:"name profile"},{path:'questions'}]);
-    const accessCode=await codeModel.findOne({code,lesson:req.params.id});
+    const accessCode=await codeModel.findOne({code,quiz:req.params.id});
     if(!accessCode){
         return next(new apiError('access code not found',400));
     };
@@ -135,16 +135,16 @@ const takeQuiz=expressHandler(async(req,res,next)=>{
     accessCode.consumed=true;
     accessCode.counter =1;
     await accessCode.save();
-    const index=user.quizzesTaken.findIndex((ele) => ele.quiz.toString() == 
-    req.params.id.toString() );
+    const index=user.quizzesTaken.findIndex(
+        (ele) => ele.quiz.toString() == req.params.id.toString() );
     if(index > -1){
-        res.status(200).json({message:"You have attended lessons before"});
+        return res.status(200).json({message:"You have taken quiz before"});
     }else {
         user.attendedLessons.push({quiz:req.params.id,takenAt:Date.now()});
     };
     await user.save();
     let result={... quiz};
-    result.questions.forEach((ele)=>{
+    result.questions.forEach( (ele)=>{
         delete ele.correctAnswer;
     });
     return res.status(200).json({quiz:result});

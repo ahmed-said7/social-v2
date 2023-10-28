@@ -74,12 +74,12 @@ const readJopApplication=expressHandler(async(req,res,next)=>{
     };
     const index=jop.applicants.findIndex( 
         ( {user} ) => user.toString() == userId.toString() );
-    if(index > -1){
+    if(index == -1){
         return next(new apiError('Not Found',400));
     };
-    const path=jop.applicants[index].cv.split('/')[2];
+    const pdfName=jop.applicants[index].cv.split('/')[2];
     res.setHeader('Content-Type', 'application/pdf');
-    const stream=fs.createReadStream(`${__dirname}}/../uploads/cv/${path}`);
+    const stream=fs.createReadStream(`${__dirname}}/../uploads/cv/${pdfName}`);
     stream.pipe(res);
 });
 

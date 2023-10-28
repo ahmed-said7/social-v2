@@ -14,9 +14,7 @@ const lessonSchema=new mongoose.Schema({
 });
 
 lessonSchema.post('init',function(doc){
-    if(doc.image){
-        doc.image=`${process.env.base_url}/videos/${doc.image}`;
-    };
+
     if(doc.video){
         doc.video=`${process.env.base_url}/videos/${doc.video}`;
     };

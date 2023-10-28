@@ -37,7 +37,7 @@ const applyCoinCoupon= expressHandler ( async(req,res,next) => {
 
 
 const generateLessonCode=expressHandler(async(req,res,next)=>{
-    if(req.body.lesson) return next(new apiError('lesson is required',400));
+    if(!req.body.lesson) return next(new apiError('lesson is required',400));
     const user=await userModel.findOne({_id:req.user._id});
     const lesson=await lessonModel.findOne({_id:req.body.lesson,isPublished:true});
     if( ! lesson ){
@@ -64,7 +64,7 @@ const generateLessonCode=expressHandler(async(req,res,next)=>{
 });
 
 const generateQuizCode=expressHandler(async(req,res,next)=>{
-    if(req.body.quiz) return next(new apiError('quiz is required',400));
+    if(!req.body.quiz) return next(new apiError('quiz is required',400));
     const user=await userModel.findOne({_id:req.user._id});
     const quiz=await quizModel.findOne({_id:req.body.quiz,isPublished:true});
     if( ! quiz ){

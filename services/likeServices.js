@@ -7,9 +7,11 @@ const storyModel = require('../models/storyModel');
 const likePost=expressHandler(async (req,res,next)=>{
     let post=await postModel.findById(req.params.id);
     if(!post) return next(new apiError('Post Not Found',400));
-    const index=post.likes.findIndex(({user})=> user.toString() == req.user._id.toString());
+    const index=post.likes.findIndex(
+        ({user})=> user.toString() == req.user._id.toString()    
+                );
     if(index > -1){
-        if(post.likes[index].type == req.body.type){
+        if( post.likes[index].type == req.body.type){
             return next(new apiError('you liked post before',400));
         };
         post.likes[index].type = req.body.type;
@@ -24,7 +26,8 @@ const likePost=expressHandler(async (req,res,next)=>{
 const unlikePost=expressHandler(async (req,res,next)=>{
     let post=await postModel.findById(req.params.id);
     if(!post) return next(new apiError('Post Not Found',400));
-    const index=post.likes.findIndex(({user})=> user.toString() == req.user._id.toString());
+    const index=post.likes.findIndex(
+        ({user})=> user.toString() == req.user._id.toString());
     if(index > -1){
         post.likes.splice(index, 1);
     };
@@ -36,7 +39,8 @@ const unlikePost=expressHandler(async (req,res,next)=>{
 const likeComment=expressHandler(async (req,res,next)=>{
     let comment=await commentModel.findById(req.params.id);
     if(!comment) return next(new apiError('comment Not Found',400));
-    const index=comment.likes.findIndex(({user})=> user.toString() == req.user._id.toString());
+    const index=comment.likes.findIndex(
+        ({user})=> user.toString() == req.user._id.toString());
     if(index > -1){
         if(comment.likes[index].type == req.body.type){
             return next(new apiError('you liked comment before',400));
@@ -54,7 +58,8 @@ const likeComment=expressHandler(async (req,res,next)=>{
 const unlikeComment=expressHandler(async (req,res,next)=>{
     let comment=await commentModel.findById(req.params.id);
     if(!comment) return next(new apiError('comment Not Found',400));
-    const index=comment.likes.findIndex(({user})=> user.toString() == req.user._id.toString());
+    const index=comment.likes.findIndex(
+        ({user})=> user.toString() == req.user._id.toString());
     if(index > -1){
         comment.likes.splice(index, 1);
     };
@@ -64,6 +69,7 @@ const unlikeComment=expressHandler(async (req,res,next)=>{
 });
 
 const likeReel=expressHandler(async(req,res,next)=>{
+
     const reel=await storyModel.findOne({user:req.params.id,reel:true});
     if(!reel || reel.likes.includes(req.user._id) ){
         return next(new apiError('Not Found',400));
@@ -71,6 +77,7 @@ const likeReel=expressHandler(async(req,res,next)=>{
     await reel.updateOne({$push:{likes:req.user._id}});
     await reel.save();
     res.status(200).json({status:"liked"});
+
 });
 
 const unlikeReel=expressHandler(async(req,res,next)=>{
