@@ -19,9 +19,9 @@ const updateCommentValidator=[
     check('id').isMongoId().withMessage('id should be mongo id'),
     check('text').optional()
     .isString().withMessage('title should be a string'),
-    check('image').optional().
-    isString.withMessage('image should be string')
-    ,validationResult
+    // check('image').optional().isString().withMessage('image should be a string')
+    // ,
+    validationResult
 ];
 
 const ValidateIdParam=[

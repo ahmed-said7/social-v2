@@ -24,7 +24,7 @@ const setFilterObj=expressHandler(async(req,res,next)=>{
     if(req.user.role == 'instructor'){
         req.filterObj.admin = req.user._id; 
     }else if(req.user.role == 'student') {
-        req.filterObj.unPublished=true;
+        req.filterObj.isPublished=true;
         req.query.select='title';
     }else if(req.user.role == 'admin'){
         req.query.select='title,unPublished';

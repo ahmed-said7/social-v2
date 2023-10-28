@@ -24,15 +24,16 @@ chatSchema.post('init',function(doc){
     };
 });
 
-chatSchema.post("remove",async function(doc){
-    await messageModel.deleteMany({chat:doc._id});
-});
+// chatSchema.post("remove",async function(doc){
+//     await messageModel.deleteMany({chat:doc._id});
+// });
 
 chatSchema.virtual('messages',{
     ref:"Message",
     localField:"_id",
     foreignField:"chat"
 });
+
 
 const chatModel=mongoose.model('Chat',chatSchema);
 module.exports=chatModel;

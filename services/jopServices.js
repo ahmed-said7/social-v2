@@ -2,6 +2,7 @@ const expressHandler=require('express-async-handler');
 const jopModel=require('../models/jopModel');
 const {updateOne,deleteOne,createOne,getAll,getOne} =require('../utils/apiFactory');
 const apiError = require('../utils/apiError');
+const fs=require('fs');
 
 const createJop=createOne(jopModel);
 const updateJop=updateOne(jopModel);
@@ -65,7 +66,24 @@ const applyToJop=expressHandler(async(req,res,next)=>{
     return res.status(200).json({status:"success , you applied successfully"});
 });
 
+const readJopApplication=expressHandler(async(req,res,next)=>{
+    const { userId }=req.body;
+    const jop=await jopModel.findById(req.params.id);
+    if(!jop){
+        return next(new apiError('Not Found',400));
+    };
+    const index=jop.applicants.findIndex( 
+        ( {user} ) => user.toString() == userId.toString() );
+    if(index > -1){
+        return next(new apiError('Not Found',400));
+    };
+    const path=jop.applicants[index].cv.split('/')[2];
+    res.setHeader('Content-Type', 'application/pdf');
+    const stream=fs.createReadStream(`${__dirname}}/../uploads/cv/${path}`);
+    stream.pipe(res);
+});
+
 module.exports={
     applyToJop,createJop,updateJop,deleteJop,setUserId,setFilterObj,getJops
-    ,accessJop,getJop
+    ,accessJop,getJop,readJopApplication
 };

@@ -109,8 +109,8 @@ const updateLoggedUser=expressHandler(async(req,res,next)=>{
 });
 
 const deleteLoggedUser=expressHandler(async(req,res,next)=>{
-    const user=await userModel.findOne({_id:req.user._id});
-    await user.remove();
+    const user=await userModel.findOneAndDelete({_id:req.user._id});
+    // await user.deleteOne();
     res.status(200).json({status:"deleted"});
 });
 

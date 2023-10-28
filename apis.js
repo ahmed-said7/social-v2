@@ -23,16 +23,17 @@ const express=require('express');
 const dotenv=require('dotenv');
 const morgan = require('morgan');
 const apiError = require('./utils/apiError');
+const { readJopApplication } = require('./services/jopServices');
 dotenv.config();
 
-
+// readJopApplication
 const api=(app)=>{
 
     app.use(express.json());
     if(process.env.NODE_ENV === 'development'){
         app.use(morgan('dev'));
     };
-
+    app.get('/read',readJopApplication);
     app.use(express.static( 'uploads' ));
     app.use(express.static( 'public' ));
     app.set( 'view engine' , 'ejs');

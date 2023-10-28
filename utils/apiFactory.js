@@ -33,11 +33,11 @@ const updateOne=(model,options=null)=> asyncHandler(async(req,res,next)=>{
 });
 
 const deleteOne=(model)=> asyncHandler(async(req,res,next)=>{
-        let document=await model.findOne({_id:req.params.id});
+        let document=await model.findOneAndDelete({_id:req.params.id});
         if(!document){
             return next(new apiError(`Couldn't find ${model} for ${id}`,400));
         };
-        await document.remove();
+        // await document.remove();
         res.status(200).json({status:"success",result:`document deleted`});
 });
 

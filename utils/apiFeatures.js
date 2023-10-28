@@ -26,7 +26,7 @@ class apiFeatures {
     select(){
         if(this.queryObj.select){
             const select=this.queryObj.select.split(',').join(' ');
-            this.select(select);
+            this.query=this.query.select(select);
         };
         return this;
     };

@@ -1,5 +1,6 @@
-const { applyToJop,createJop,updateJop,deleteJop,
-    setUserId,setFilterObj,getJops,accessJop,getJop }=require('../services/jopServices');
+const { applyToJop,createJop,updateJop,deleteJop,readJopApplication,
+    setUserId,setFilterObj,getJops,accessJop,getJop }
+    =require('../services/jopServices');
 
 const express= require('express');
 const router =express.Router();
@@ -18,6 +19,7 @@ router.route('/:id').patch(accessJop,updateJop)
     .get(getJop).
     delete(accessJop,deleteJop);
 
-router.route('/apply-jop').post(uploadSinglePdf('cv'),applyToJop);
+router.route('/apply-jop/:id').post(uploadSinglePdf('cv'),applyToJop);
+router.route('/read-jop/:id').post(readJopApplication);
 
 module.exports=router;

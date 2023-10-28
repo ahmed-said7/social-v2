@@ -57,26 +57,26 @@ reviewSchema.post('save',async function(doc){
     };
 });
 
-// reviewSchema.pre(/^findOneAnd/,async function(next){
-//     this.doc=await this.findOne();
-//     next();
-// });
+reviewSchema.pre(/^findOneAnd/,async function(next){
+    this.doc=this.clone().findOne({});
+    next();
+});
 
-// reviewSchema.post(/^findOneAnd/,async function(){
-//     if(this.doc.lesson){
-//         this.constructor.staticFunc(this.doc.lesson,lessonModel);
-//     }else if(this.doc.quiz){
-//         this.constructor.staticFunc(this.doc.lesson,quizModel);
-//     };
-// });
-
-reviewSchema.post("remove",async function(doc){
-    if(doc.lesson){
-        this.constructor.staticFunc(doc.lesson,lessonModel);
-    }else if(doc.quiz){
-        this.constructor.staticFunc(doc.lesson,quizModel);
+reviewSchema.post(/^findOneAnd/,async function(){
+    if(this.doc.lesson){
+        this.constructor.staticFunc(this.doc.lesson,lessonModel);
+    }else if(this.doc.quiz){
+        this.constructor.staticFunc(this.doc.lesson,quizModel);
     };
 });
+
+// reviewSchema.post("remove",async function(doc){
+//     if(doc.lesson){
+//         this.constructor.staticFunc(doc.lesson,lessonModel);
+//     }else if(doc.quiz){
+//         this.constructor.staticFunc(doc.lesson,quizModel);
+//     };
+// });
 
 const reviewModel=mongoose.model('Review',reviewSchema);
 module.exports=reviewModel;

@@ -66,7 +66,7 @@ userSchema.pre('save',async function(next){
 });
 
 userSchema.post('init',function(doc){
-    if(doc.cover.length>0){
+    if(doc.cover?.length>0){
         doc.cover.forEach((img,i)=>{
             doc.cover[i]=`${process.env.base_url}/user/${img}`;
         });
@@ -76,8 +76,16 @@ userSchema.post('init',function(doc){
     };
 });
 
+userSchema.pre('findOneAndDelete',async function(next){
+    this.user=await this.clone().findOne({});
+    // console.log(this.user)
+    return next();
+});
 
-userSchema.post("remove",async function(doc){
+userSchema.post("findOneAndDelete",async function(){
+    // const doc=this.user;
+    const doc =this.user;
+    console.log(doc);
     const posts=await postModel.find({user:doc._id});
     const Ids=posts.map((ele)=> ele._id);
     await commentModel.deleteMany({post:{$in:Ids}});

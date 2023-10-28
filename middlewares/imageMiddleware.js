@@ -18,7 +18,9 @@ const uploadPdf=()=>{
         }
         });
     const filter=function(req,file,cb){
-        if (file.mimetype.startsWith('file')){
+        console.log(file);
+        const ext=file.mimetype.split('/')[1];
+        if ( ext == 'pdf' ){
             return cb( null , true );
         } else { 
             return cb( new apiError('Invalid file',400) , false );

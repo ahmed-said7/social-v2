@@ -23,7 +23,7 @@ jopSchema.post('init',function(doc){
     };
     if(doc.applicants){
         doc.applicants.forEach(({cv},index)=>{
-            doc.applicants[index].cv=`${process.env.base_url}/jop/${cv}`;
+            doc.applicants[index].cv=`${process.env.base_url}/cv/${cv}`;
         });
     };
 });

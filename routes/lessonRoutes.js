@@ -19,8 +19,8 @@ router.route('/:id').get(getLesson)
     .patch(accessLesson,uploadSingleVideo('video'),updateLesson)
     .delete(accessLesson,deleteLesson);
 
-router.route('/publish/:id').post(accessLesson,publishLesson);
-router.route('/unpublish/:id').post(accessLesson,unpublishLesson);
+router.route('/publish/:id').patch(accessLesson,publishLesson);
+router.route('/unpublish/:id').patch(accessLesson,unpublishLesson);
 router.route('/attend/:id').post(attendLesson);
 
 module.exports = router;
