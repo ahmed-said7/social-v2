@@ -1,10 +1,14 @@
 const mongoose= require('mongoose');
 require('dotenv').config();
+
 const messageSchema=new mongoose.Schema({
     images:[String],text:String,
+    // details:[{user:{type:mongoose.Types.ObjectId,ref:"User"}
+    // ,delivered:{type:Boolean}}],
     chat:{type:mongoose.Types.ObjectId,ref:"Chat"},
     sender:{type:mongoose.Types.ObjectId,ref:"User"},
     recipient:[{type:mongoose.Types.ObjectId,ref:"User"}]
+    ,seenByAdmin:{type:Boolean,default:false}
 },{
     timestamps:true,toObject:{virtuals:true},
     toJSON:{virtuals:true}

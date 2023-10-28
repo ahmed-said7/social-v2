@@ -5,14 +5,20 @@ const commentModel = require('./commentModel');
 const postModel = require('./postModel');
 const messageModel = require('./messageModel');
 const chatModel =require('./chatModel');
+const reviewModel = require('./reviewModel');
+const lessonModel = require('./lessonModel');
+const resultModel = require('./resultModel');
+const quizModel = require('./quizModel');
+const questionModel = require('./questionModel');
+
 const userSchema = new mongoose.Schema(
     {
         name:{type:String,required:true,min:3},
         password:{type:String,required:true,min:6},
-        username:{type:String,required:true},
+        // username:{type:String,required:true},
         email:{type:String,required:true,unique:true},
         coins:{type:Number,default:0},
-        role:{type:String,default:'user',enum:['user','admin']},
+        role:{type:String,default:'student',enum:['student','admin','instructor']},
         birth:Date,
         cover:[String],
         profile:String,
@@ -38,18 +44,24 @@ const userSchema = new mongoose.Schema(
         instagram:String,
         passwordChangedAt:Date,
         passwordResetCode:String,
-        passwordExpiredAt:Date,
+        resetCodeExpiredAt:Date,
         resetCodeVertified:Boolean,
-        transaction:[{amount:Number,time:Date,orderId:Number,paid:Boolean}]
-    } , {timestamps:true} );
+        transaction:[{amount:Number,time:Date,orderId:Number,paid:Boolean}],
+        attendedLessons:[{ lesson:{ type:mongoose.Schema.Types.ObjectId , ref:"Lesson" }
+        , attendedAt:Date }],
+        quizzesTaken:[{ quiz:{ type:mongoose.Schema.Types.ObjectId , ref:"Quiz" }
+        , takenAt:Date }]
+        ,coordinates:[Number]
+} , {timestamps:true} );
 
+userSchema.index({coordinates:"2dsphere"});
 
 userSchema.pre('save',async function(next){
-    if(this.birth){
+    if( this.isModified('birth') ){
         this.birth=new Date(this.birth);
     };
     if(! this.isModified("password")){ return next();}
-    this.password=await bcryptjs.hash(this.password,10);
+    this.password=await bcryptjs.hash( this.password , 10 );
     next();
 });
 
@@ -65,16 +77,21 @@ userSchema.post('init',function(doc){
 });
 
 
-userSchema.post("findOneAndDelete",async function(doc){
+userSchema.post("remove",async function(doc){
     const posts=await postModel.find({user:doc._id});
     const Ids=posts.map((ele)=> ele._id);
     await commentModel.deleteMany({post:{$in:Ids}});
     await postModel.deleteMany({user:doc._id});
     await chatModel.updateMany({"members":doc._id},{$pull:{members:doc._id}});
     await messageModel.deleteMany({sender:doc._id});
+    await lessonModel.deleteMany({admin:doc._id});
+    await reviewModel.deleteMany({ user : doc._id});
+    await resultModel.deleteMany({ user : doc._id});
+    const quizIds=await quizModel.find({admin:doc._id}).select('_id');
+    await questionModel.deleteMany({ quiz : { $in : quizIds } });
+    await resultModel.deleteMany({admin:doc._id});
 });
 
 const userModel=mongoose.model('User',userSchema);
-
 
 module.exports=userModel;

@@ -1,3 +1,5 @@
+const searchQuery = require("./search");
+
 class apiFeatures {
     constructor(query,queryObj){
         this.query = query;
@@ -11,13 +13,13 @@ class apiFeatures {
         queryString=queryString.replace( /gt|gte|lte|lt/ig , (val)=> `$${val}`);
         queryFilter=JSON.parse(queryString);
         queryFilter={ ...queryFilter , ...filter };
-        this.query.find(queryFilter);
+        this.query=this.query.find(queryFilter);
         return this;
     };
     sort(){
         if(this.queryObj.sort){
             const sort=this.queryObj.sort.split(',').join(' ');
-            this.select(sort);
+            this.query=this.query.select(sort);
         };
         return this;
     };
@@ -28,9 +30,13 @@ class apiFeatures {
         };
         return this;
     };
-    search(modelName=''){
-        if(this.queryObj.keyword && modelName == 'user'){
-            this.find({ name : { $regex:this.queryObj.keyword } })
+    search(name){
+        if(this.queryObj.keyword && name){
+            const obj=searchQuery(this.queryObj.keyword);
+            const keys=Object.keys(obj);
+            if( keys.includes(name) ){
+                this.query =this.query.find(obj[name]);
+            };
         };
         return this;
     };
@@ -51,6 +57,12 @@ class apiFeatures {
         Obj.numOfDocs=endIndex;
         this.Obj=Obj;
         this.query=this.query.skip(skip).limit(limit);
+        return this;
+    };
+    population(options){
+        if(options){
+            this.query=this.query.populate(options);
+        };
         return this;
     };
 };

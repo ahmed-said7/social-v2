@@ -8,7 +8,8 @@ const storySchema=new mongoose.Schema({
     ,video:String,
     image:String,
     reel:{type:Boolean,default:false},
-    duration:Date
+    duration:Date,
+    likes:[{type:mongoose.Types.ObjectId,ref:"User"}]
     ,votes:[{
         type:{type:Number,min:0,max:100},
         user:{type:mongoose.Types.ObjectId,ref:"User"}
@@ -28,6 +29,7 @@ storySchema.pre('save', function(next){
 
 storySchema.pre( /^find/ ,async function(next){
     await storyModel.updateMany({ reel:false , duration :{ $lt : Date.now() }},{active:false});
+    // await storyModel.deleteMany({active:false});
     this.find({active:true});
     return next();
 });
@@ -37,7 +39,7 @@ storySchema.post('init',function(doc){
         doc.image=`${process.env.base_url}/story/${doc.image}`;
     };
     if(doc.video){
-        doc.video=`${process.env.base_url}/story/${doc.image}`;
+        doc.video=`${process.env.base_url}/videos/${doc.image}`;
     };
 });
 

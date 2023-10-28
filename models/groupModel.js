@@ -4,7 +4,7 @@ require('dotenv').config();
 const groupSchema=new mongoose.Schema({
     admin:{type:mongoose.Types.ObjectId,ref:"User"},
     image:String,
-    text:String,
+    name:String,
     description:String,
     requests:[{type:mongoose.Types.ObjectId,ref:"User"},],
     members:[{type:mongoose.Types.ObjectId,ref:"User"},]
@@ -23,6 +23,7 @@ groupSchema.post('init',function(doc){
         doc.image=`${process.env.base_url}/group/${doc.image}`;
     };
 });
+
 
 
 const groupModel=mongoose.model('Group',groupSchema);

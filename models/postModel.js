@@ -28,7 +28,7 @@ postSchema.post('init',function(doc){
     };
 });
 
-postSchema.post("findOneAndDelete",async function(doc){
+postSchema.post("remove",async function(doc){
     await commentModel.deleteMany({post:doc._id});
 });
 

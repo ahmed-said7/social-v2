@@ -18,7 +18,7 @@ const getNotifications=expressHandler(async(req,res,next)=>{
 
 const accessNotification=expressHandler(async(req,res,next)=>{
     const notification=await notificationModel.findById(req.params.id);
-    if( notification.user.toString() != req.user._id.toString() ){
+    if( notification?.user.toString() != req.user._id.toString() ){
         return next(new apiError('you are not notificatio owner',400));
     };
     return next();

@@ -4,7 +4,7 @@ const postModel=require('../models/postModel');
 const apiError = require('../utils/apiError');
 const{getAll,createOne,updateOne,deleteOne}=require('../utils/apiFactory');
 
-const getUsers=getAll(userModel);
+const getUsers=getAll(userModel,'user');
 
 const createUser=createOne(userModel);
 
@@ -24,7 +24,7 @@ const updateUserPassword=expressHandler(async (req, res, next) =>{
 
 const addFriend=expressHandler(async (req,res,next)=>{
     let sender = req.user;
-    if(sender._id == req.params.id) return next(new apiError('can not add friend',400));
+    if(sender._id.toString() == req.params.id.toString()) return next(new apiError('can not add friend',400));
     let reciver=await userModel.findById(req.params.id);
     if( reciver.friends.includes(sender._id) || reciver.requests.includes(sender._id) ){
         return next(new apiError('can not add friend',400))
@@ -40,14 +40,12 @@ const addFriend=expressHandler(async (req,res,next)=>{
 
 const cancelRequest=expressHandler(async (req,res,next)=>{
     let sender = req.user;
-    if(sender._id == req.params.id) return next(new apiError('can not cancel request',400));
+    if(sender._id.toString() == req.params.id.toString()) return next(new apiError('can not cancel request',400));
     let reciver = await userModel.findById(req.params.id);
     if( sender.friends.includes( reciver._id ) || !reciver.requests.includes(sender._id) ){
         return next(new apiError('can not cancel request',400))
     };
-    await sender.updateOne({$pull:{following:reciver._id}}).
-    select('following').
-    populate({path:'following',select:"name profile"});
+    await sender.updateOne({$pull:{following:reciver._id}});
     await reciver.updateOne({$pull:{requests:sender._id}});
     await reciver.updateOne({$pull:{followers:sender._id}});
     await sender.save();
@@ -58,7 +56,7 @@ const cancelRequest=expressHandler(async (req,res,next)=>{
 
 const unFriend=expressHandler(async (req,res,next)=>{
     let sender = req.user;
-    if(sender._id == req.params.id) return next(new apiError('can not un friend',400));
+    if(sender._id.toString() == req.params.id.toString()) return next(new apiError('can not un friend',400));
     let reciver=await userModel.findById(req.params.id);
     if( !sender.friends.includes( reciver._id ) ){
         return next(new apiError('can not un friend',400))
@@ -77,7 +75,7 @@ const unFriend=expressHandler(async (req,res,next)=>{
 
 const acceptRequest=expressHandler(async (req,res,next)=>{
     let sender = req.user;
-    if(sender._id == req.params.id) return next(new apiError('can not add friend',400));
+    if(sender._id.toString() == req.params.id.toString()) return next(new apiError('can not add friend',400));
     let reciver=await userModel.findById(req.params.id);
     if( !sender.requests.includes( reciver._id ) || sender.friends.includes( reciver._id )  ){
         return next(new apiError('can not accept friend',400))
@@ -95,7 +93,7 @@ const acceptRequest=expressHandler(async (req,res,next)=>{
 
 const deleteRequest=expressHandler(async (req,res,next)=>{
     let sender = req.user;
-    if(sender._id == req.params.id) return next(new apiError('can not cancel request',400));
+    if(sender._id.toString() == req.params.id.toString()) return next(new apiError('can not cancel request',400));
     let reciver = await userModel.findById(req.params.id);
     if( sender.friends.includes( reciver._id ) || !sender.requests.includes(reciver._id) ){
         return next(new apiError('can not delete request',400))
@@ -111,7 +109,7 @@ const deleteRequest=expressHandler(async (req,res,next)=>{
 
 const follow=expressHandler(async (req,res,next)=>{
     let sender = req.user;
-    if(sender._id == req.params.id) return next(new apiError('can not cancel request',400));
+    if(sender._id.toString() == req.params.id.toString()) return next(new apiError('can not cancel request',400));
     let reciver = await userModel.findById(req.params.id);
     if( sender.following.includes(reciver._id) ){
         return next(new apiError('can not follow user',400))
@@ -126,7 +124,7 @@ const follow=expressHandler(async (req,res,next)=>{
 
 const unfollow=expressHandler(async (req,res,next)=>{
     let sender = req.user;
-    if(sender._id == req.params.id) return next(new apiError('can not cancel request',400));
+    if(sender._id.toString() == req.params.id.toString()) return next(new apiError('can not cancel request',400));
     let reciver = await userModel.findById(req.params.id);
     if( !sender.following.includes(reciver._id) ){
         return next(new apiError('can not un follow user',400))
@@ -141,7 +139,7 @@ const unfollow=expressHandler(async (req,res,next)=>{
 
 const followBack=expressHandler(async (req,res,next)=>{
     let sender = req.user;
-    if(sender._id == req.params.id) return next(new apiError('can not follow back',400));
+    if(sender._id.toString() == req.params.id.toString()) return next(new apiError('can not follow back',400));
     let reciver = await userModel.findById(req.params.id);
     if( !sender.followers.includes(reciver._id) ){
         return next(new apiError('can not follow back user',400))
@@ -156,7 +154,7 @@ const followBack=expressHandler(async (req,res,next)=>{
 
 const removeFollwer=expressHandler(async (req,res,next)=>{
     let sender = req.user;
-    if(sender._id == req.params.id) return next(new apiError('can not remove follower',400));
+    if(sender._id.toString() == req.params.id.toString()) return next(new apiError('can not remove follower',400));
     let reciver = await userModel.findById(req.params.id);
     if( !sender.followers.includes(reciver._id) ){
         return next(new apiError('can not remove follower',400))
@@ -204,7 +202,7 @@ const getProfile=expressHandler( async (req,res, next) => {
     populate([
         {
             path:"user",select:"name profile",Model:"User"
-        },
+        }
         // logic is true but data is not required
         // {
         //     path:"comments",select:"text images user",Model:"Comment",
@@ -214,9 +212,9 @@ const getProfile=expressHandler( async (req,res, next) => {
         //         populate:{path:"user",select:"name profile",model:"User"},
         //     }
         // },
-        {
-            path:"likes",select:"type user"
-        }
+        // {
+        //     path:"likes",select:"type user"
+        // }
         ,]);
     Obj.friend= user.friends?.includes(req.user._id) ? true : false;
     Obj.following= user.followers?.includes(req.user._id) ? true : false;
@@ -228,11 +226,12 @@ const getProfile=expressHandler( async (req,res, next) => {
 const savePost=expressHandler(async (req,res,next)=>{
     let user=req.user;
     const index=user.savedPosts.findIndex( (el) => el.post.toString() == req.params.id.toString());
-    if(index > -1){
+    if (index > -1) {
         user.savedPosts[index].savedAt= new Date();
-    }else {
+    } else {
         user.savedPosts.push({ savedAt:Date.now() , post:req.params.id });
     };
+    await user.save();
     await user.populate([
         { 
             path:"savedPosts.post" , 
@@ -249,6 +248,7 @@ const unsavePost=expressHandler(async (req,res,next)=>{
     if(index > -1){
         user.savedPosts.splice(index, 1);
     };
+    await user.save();
     await user.populate([
         { 
             path:"savedPosts.post" , 
@@ -259,10 +259,57 @@ const unsavePost=expressHandler(async (req,res,next)=>{
     res.status(201).json({savedPosts:user.savedPosts});
 });
 
+// @Route /: distance /: unit
+// @ get closest people from a distance
+//  one mile => 1609.344 meters
+
+const getClosestPeople=expressHandler(async (req,res,next)=>{
+    const [lat, lng]=req.user.coordinates;
+    if( !lat || !lng ){
+        return next(new apiError('lat lng not found',400));
+    };
+    const distance= req.params.distance ;
+    const unit= req.params.unit ;
+    const radius= unit == 'mi' ? distance / 3963.2 : distance / 6378.1 ;
+    const result=await userModel.find({
+        coordinates:{ $geoWithin : { $centerSphere : [ [lng , lat] , radius ] } }
+    });
+    if(result.length == 0){
+        return res.status(200).json({ status:"not found"});
+    };
+    return res.status(200).json({ result });
+});
+
+//  one mile => 1609.344 meters
+
+const getDistancePeople=expressHandler(async (req,res,next)=>{
+    const [ lat , lng ]=req.user.coordinates;
+    if( !lat || !lng ){
+        return next(new apiError('lat lng not found',400));
+    };
+    const unit = req.params.unit;
+    const mul = unit == 'km' ? .001 : .000621371;
+    const result=await userModel.aggregate([
+        {
+            $geoNear : {
+                near : { type:'Point' , coordinates: [ lng*1 , lat*1 ] },
+                distanceField : "distance",
+                distanceMultiplier : mul
+            }
+        }
+    ]);
+    if( result.length == 0 ){
+        return res.status(200).json({ status:"not found"});
+    };
+    return res.status(200).json({ result });
+});
+
+
 module.exports = 
     {
-    addFriend,getProfile,cancelRequest,
-    deleteRequest,addToSearch,removeFromSearch,removeFollwer,
-    followBack,unfollow,follow,acceptRequest,unFriend,getUsers,
-    createUser,deleteUser,updateUserPassword,updateUser,savePost,unsavePost
+        addFriend,getProfile,cancelRequest,
+        deleteRequest,addToSearch,removeFromSearch,removeFollwer,
+        followBack,unfollow,follow,acceptRequest,unFriend,getUsers,
+        createUser,deleteUser,updateUserPassword,updateUser,savePost,unsavePost,
+        getClosestPeople,getDistancePeople
     };

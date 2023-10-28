@@ -11,13 +11,20 @@ const chatSchema=new mongoose.Schema({
     toJSON:{virtuals:true}
 });
 
+chatSchema.pre('save',function(next){
+    if(this.members.length > 3){
+        this.isGroup=true;
+    };
+    next();
+});
+
 chatSchema.post('init',function(doc){
     if(doc.image){
         doc.image=`${process.env.base_url}/chat/${doc.image}`;
     };
 });
 
-chatSchema.post("findOneAndDelete",async function(doc){
+chatSchema.post("remove",async function(doc){
     await messageModel.deleteMany({chat:doc._id});
 });
 
@@ -26,7 +33,6 @@ chatSchema.virtual('messages',{
     localField:"_id",
     foreignField:"chat"
 });
-
 
 const chatModel=mongoose.model('Chat',chatSchema);
 module.exports=chatModel;
