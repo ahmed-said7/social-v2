@@ -17,8 +17,6 @@ quizSchema.virtual('questions',{
     foreignField:"quiz"
 });
 
-
-
 const quizModel=mongoose.model('Quiz',quizSchema);
 
 module.exports = quizModel;

@@ -225,7 +225,8 @@ const getProfile=expressHandler( async (req,res, next) => {
 
 const savePost=expressHandler(async (req,res,next)=>{
     let user=req.user;
-    const index=user.savedPosts.findIndex( (el) => el.post.toString() == req.params.id.toString());
+    const index=user.savedPosts.findIndex( 
+        (el) => el.post.toString() == req.params.id.toString());
     if (index > -1) {
         user.savedPosts[index].savedAt= new Date();
     } else {
@@ -244,7 +245,8 @@ const savePost=expressHandler(async (req,res,next)=>{
 
 const unsavePost=expressHandler(async (req,res,next)=>{
     let user=req.user;
-    const index=user.savedPosts.findIndex( (el) => el.post.toString() == req.params.id.toString());
+    const index=user.savedPosts.findIndex( 
+        (el) => el.post.toString() == req.params.id.toString() );
     if(index > -1){
         user.savedPosts.splice(index, 1);
     };

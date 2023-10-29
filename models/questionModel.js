@@ -10,8 +10,6 @@ const questionSchema=new mongoose.Schema({
     toJSON:{virtuals:true}
 });
 
-
-
 const questionModel=mongoose.model('Question',questionSchema);
 
 module.exports = questionModel;
