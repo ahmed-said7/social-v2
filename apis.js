@@ -33,9 +33,6 @@ const api=(app)=>{
     if(process.env.NODE_ENV === 'development'){
         app.use(morgan('dev'));
     };
-
-
-    
     app.get('/read',readJopApplication);
     app.use(express.static( 'uploads' ));
     app.use(express.static( 'public' ));
