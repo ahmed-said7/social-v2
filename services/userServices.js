@@ -310,8 +310,11 @@ const getDistancePeople=expressHandler(async (req,res,next)=>{
 module.exports = 
     {
         addFriend,getProfile,cancelRequest,
-        deleteRequest,addToSearch,removeFromSearch,removeFollwer,
-        followBack,unfollow,follow,acceptRequest,unFriend,getUsers,
-        createUser,deleteUser,updateUserPassword,updateUser,savePost,unsavePost,
+        deleteRequest,addToSearch,
+        removeFromSearch,removeFollwer,
+        followBack,unfollow,follow,
+        acceptRequest,unFriend,getUsers,
+        createUser,deleteUser,updateUserPassword
+        ,updateUser,savePost,unsavePost,
         getClosestPeople,getDistancePeople
     };

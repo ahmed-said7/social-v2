@@ -4,7 +4,8 @@ const router =express.Router();
 const {protected,allowedTo}=require('../services/authServices');
 const {attendLesson,getLesson,unpublishLesson,publishLesson
     ,accessLesson,setFilterObj,deleteLesson,updateLesson,getAllLessons,
-    createLesson
+    createLesson,
+    streamLessonVideo
 }=require('../services/lessonServices');
 const { uploadSingleVideo } = require('../middlewares/imageMiddleware');
 
@@ -22,5 +23,6 @@ router.route('/:id').get(getLesson)
 router.route('/publish/:id').patch(accessLesson,publishLesson);
 router.route('/unpublish/:id').patch(accessLesson,unpublishLesson);
 router.route('/attend/:id').post(attendLesson);
+router.route('/stream-video/:id').post(streamLessonVideo);
 
 module.exports = router;

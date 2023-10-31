@@ -3,7 +3,9 @@ const apiError = require('../utils/apiError');
 const {updateOne,deleteOne,getAll} =require('../utils/apiFactory');
 const lessonModel = require('../models/lessonModel');
 const codeModel = require('../models/codeModel');
-
+const fs=require('fs');
+const {promisify} =require('util')
+const _stat=promisify(fs.stat);
 
 const createLesson=expressHandler(async(req,res,next)=>{
     req.body.admin=req.user._id;
@@ -86,6 +88,30 @@ const getLesson=expressHandler(async(req,res,next)=>{
     return res.status(200).json({lesson});
 });
 
+const streamLessonVideo=expressHandler(async(req,res,next)=>{
+    const lesson=await lessonModel.findById(req.params.id);
+    if( !lesson ){
+        return next(new apiError('Not Found',400));
+    };
+    const range=req.headers.range;
+    if(!range) return next(new apiError('range not specified'),400);
+    const videoName= lesson.video;
+    const path=`${__dirname}}/../uploads/videos/${videoName}`
+    const size=(await _stat(path)).size;
+    const chunk= 10**6;
+    const start=parseInt( range.replace(/bytes=/g,'').split('-')[0] );
+    const end=Math.min( chunk+start , size - 1 );
+    const contentLength=end-start+1 ;
+    res.writeHead( 206 ,{
+        "Content-Range": `bytes ${start}-${end}/${size}`,
+        "Accept-Ranges": "bytes",
+        "Content-Length": contentLength ,
+        "Content-Type": "video/mp4" 
+    });
+    const stream=fs.createReadStream(path,{start,end});
+    stream.pipe(res);
+});
+
 const attendLesson=expressHandler(async(req,res,next)=>{
     let user=req.user;
     const {code}=req.body;
@@ -118,7 +144,10 @@ const attendLesson=expressHandler(async(req,res,next)=>{
     return res.status(200).json({lesson:user.attendedLessons});
 });
 
-module.exports ={attendLesson,getLesson,unpublishLesson,publishLesson
-    ,accessLesson,setFilterObj,deleteLesson,updateLesson,getAllLessons,
-    createLesson
+module.exports ={
+    attendLesson,getLesson,
+    unpublishLesson,publishLesson
+    ,accessLesson,setFilterObj,deleteLesson,
+    updateLesson,getAllLessons,
+    createLesson,streamLessonVideo
 };

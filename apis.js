@@ -1,4 +1,4 @@
-const coinRouter=require('./coinRoutes');
+const coinRouter=require('./routes/coinRoutes');
 const userRouter=require('./routes/userRoutes');
 const authRouter=require('./routes/authRoutes');
 const postRouter=require('./routes/postRoute');

@@ -1,5 +1,8 @@
 const expressHandler=require('express-async-handler');
 const apiError = require('../utils/apiError');
+const fs=require('fs');
+const {promisify} =require('util')
+const _stat=promisify(fs.stat);
 const{updateOne,deleteOne,getAll,getOne}=require('../utils/apiFactory');
 const storyModel = require('../models/storyModel');
 
@@ -106,7 +109,39 @@ const accessStory=expressHandler(async(req,res,next)=>{
     return next();
 });
 
-module.exports = { accessStory,createStory,getFollowingStories,getUserStories,
-    getAllStories,getStory,updateStory,deleteStory,voteStory,unvoteStory
-    ,getLoggedUserStories ,getLoggedUserReels,setRequestParam
+const streamStoryVideo=expressHandler(async(req,res,next)=>{
+    const story=await storyModel.findById(req.params.id);
+    if( !story ){
+        return next(new apiError('Not Found',400));
+    };
+    const range=req.headers.range;
+    if(!range) return next(new apiError('range not specified'),400);
+    const videoName= story.video ;
+    const path=`${__dirname}}/../uploads/videos/${videoName}`
+    const size=(await _stat(path)).size;
+    const chunk= 10**6;
+    const start=parseInt( range.replace(/bytes=/g,'').split('-')[0] );
+    const end=Math.min( chunk+start , size - 1 );
+    const contentLength=end-start+1 ;
+    res.writeHead( 206 ,{
+        "Content-Range": `bytes ${start}-${end}/${size}`,
+        "Accept-Ranges": "bytes",
+        "Content-Length": contentLength ,
+        "Content-Type": "video/mp4" 
+    });
+    const stream=fs.createReadStream(path,{start,end});
+    stream.pipe(res);
+});
+
+module.exports = { 
+    accessStory,createStory,
+    getFollowingStories,
+    getUserStories,
+    getAllStories,getStory,
+    updateStory,deleteStory,
+    voteStory,unvoteStory
+    ,getLoggedUserStories ,
+    getLoggedUserReels,
+    setRequestParam,
+    streamStoryVideo
 };

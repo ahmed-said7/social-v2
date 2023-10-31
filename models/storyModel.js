@@ -39,9 +39,9 @@ storySchema.post('init',function(doc){
     if(doc.image){
         doc.image=`${process.env.base_url}/story/${doc.image}`;
     };
-    if(doc.video){
-        doc.video=`${process.env.base_url}/videos/${doc.image}`;
-    };
+    // if(doc.video){
+    //     doc.video=`${process.env.base_url}/videos/${doc.video}`;
+    // };
 });
 
 const storyModel=mongoose.model('Story',storySchema);
