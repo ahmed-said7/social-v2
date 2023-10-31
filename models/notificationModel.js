@@ -2,8 +2,7 @@ const mongoose= require('mongoose');
 require('dotenv').config();
 const notificationSchema=new mongoose.Schema({
     text:String,
-    url:String,
-    user:{type:mongoose.Types.ObjectId,ref:"Notification"}
+    user:{type:mongoose.Types.ObjectId,ref:"User"}
 },{
     timestamps:true
 });

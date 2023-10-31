@@ -2,6 +2,7 @@ const express= require('express');
 const router =express.Router();
 
 const {protected,allowedTo} = require('../services/authServices');
+
 const { accessMessage,createMessage,setFilterObject,getMessageRecipient,
     updateSeenByAdmin,
     deleteMessage,updateMessage,getMessages }
@@ -13,7 +14,6 @@ router.use(protected);
 
 const {createMessageValidator,updateMessageValidator
     ,ValidateIdParam}=require('../validator/messageValidator');
-
 
 router.route('/').
     post(uploadMultipleImage([{name:"images",maxCount:10}])
@@ -27,4 +27,5 @@ router.route('/:id')
     ,resizeMultipleFiles('message',"images",undefined),updateMessage);
 
 router.route('/seenByAdmin/:id').patch(accessMessage,updateSeenByAdmin);
+
 module.exports=router;

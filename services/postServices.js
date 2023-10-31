@@ -34,7 +34,7 @@ const getPostLikes=expressHandler(async(req,res,next)=>{
     const post=await postModel.findById(req.params.id);
     if(!post){
         return next(new apiError('you are not post owner',400));
-    }
+    };
     await post.populate({path:"likes.user",select:"name proofile"});
     return res.status(200).json({ likes : post.likes });
 });
@@ -49,3 +49,4 @@ const setUserId=expressHandler(async(req,res,next)=>{
 module.exports = { createPost,getPost,getPosts,
     accessPost,deletePost,updatePost,
     setUserId,setFilterObject,getPostLikes };
+

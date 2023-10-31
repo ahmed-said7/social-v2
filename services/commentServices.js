@@ -7,10 +7,13 @@ const expressHandler = require('express-async-handler');
 const createComment=createOne(commentModel);
 const deleteComment=deleteOne(commentModel);
 const updateComment=updateOne(commentModel);
-const getComment=getOne(commentModel,{path:"user",select:"name profile"});
-const getComments=getAll(commentModel,'comment',[{path:"user",select:"name profile"}]);
+const getComment=getOne(commentModel, 
+            {path:"user",select:"name profile"});
 
-const setFilterObject=expressHandler(async (req,res,next) => {
+const getComments=getAll(commentModel,'comment',
+            [{path:"user",select:"name profile"}]);
+
+const setFilterObject=expressHandler( async (req,res,next) => {
     req.filterObj={};
     if(req.params.postId){
         req.filterObj.post=req.params.postId;
@@ -40,8 +43,9 @@ const setUserId=expressHandler(async(req,res,next)=>{
     return next();
 });
 
-module.exports = { createComment,getComments,
-    getComment,deleteComment,
+module.exports = 
+{ 
+    createComment,getComments,getComment,deleteComment,
     updateComment,accessComment,
     setFilterObject,setUserId,getCommentLikes
 };
