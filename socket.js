@@ -11,14 +11,14 @@ const groupModel = require('./models/groupModel');
 const socket=( io )=>{
 
     let connectedUsers=[];
-    // const Obj={};
+    const Obj={};
     const onChat={};
 
     io.on('connection',(socket)=>{
 
         socket.on('goOnline',({userId})=>{
             connectedUsers.push({ socketId:socket.id , userId });
-            // Obj[userId]=true;
+            Obj[userId]=true;
             console.log(connectedUsers);
         });
         
