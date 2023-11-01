@@ -24,6 +24,8 @@ const dotenv=require('dotenv');
 const morgan = require('morgan');
 const apiError = require('./utils/apiError');
 const { readJopApplication } = require('./services/jopServices');
+// const { testVideo } = require('./services/storyServices');
+// const { testVideo } = require('./services/storyServices');
 dotenv.config();
 
 // readJopApplication
@@ -36,6 +38,12 @@ const api=(app)=>{
     app.get('/read',readJopApplication);
     app.use(express.static( 'uploads' ));
     app.use(express.static( 'public' ));
+    
+    // app.get('/render',(req, res, next) =>{
+    //     res.render('test.ejs');
+    // });
+    // app.get('/videos',testVideo);
+    
     app.set( 'view engine' , 'ejs');
     app.post( '/webhook' , coinWebhook );
     app.get( '/success' , successPage );
@@ -58,6 +66,7 @@ const api=(app)=>{
     app.use('/review',reviewRouter);
     app.use('/question',questionRouter);
     app.use('/jop',jopRouter);
+    
     app.all( '*' , (req,res,next) => next ( new apiError('can not find route',400) ));
     app.use(errorMiddleware);
 

@@ -133,6 +133,34 @@ const streamStoryVideo=expressHandler(async(req,res,next)=>{
     stream.pipe(res);
 });
 
+
+// const testVideo=expressHandler(async(req,res,next)=>{
+//     const range=req.headers.range;
+//     let counter=0;
+//     if(!range) return next(new apiError('range not specified'),400);
+//     // console.log(range);
+//     const videoName= "video-a96762db-76a1-4459-86bc-2e7750559492-1698777327754.mp4";
+//     const path=`${__dirname}}/../uploads/videos/${videoName}`
+//     const size=(await _stat(path)).size;
+//     const chunk= 10**6;
+//     const start=parseInt( range.replace(/bytes=/g,'').split('-')[0] );
+//     const end=Math.min( chunk+start , size - 1 );
+//     const contentLength=end-start+1 ;
+//     const result=Math.floor(size / chunk);
+//     console.log(result);
+//     res.writeHead( 206 ,{
+//         "Content-Range": `bytes ${start}-${end}/${size}`,
+//         "Accept-Ranges": "bytes",
+//         "Content-Length": contentLength ,
+//         "Content-Type": "video/mp4" 
+//     });
+//     const stream=fs.createReadStream(path,{start,end});
+//     // counter +=1;
+//     // console.log(counter);
+//     stream.pipe(res);
+// });
+
+
 module.exports = { 
     accessStory,createStory,
     getFollowingStories,
